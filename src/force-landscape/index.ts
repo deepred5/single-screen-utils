@@ -8,7 +8,7 @@ interface Props {
   delay?: number;
 };
 
-const defaultProps = {
+const defaultProps: Props = {
   id: '#app',
   detectType: DetectType.size,
   delay: 800,
@@ -24,7 +24,7 @@ const forceLandscape = (p: Props) => {
         null;
   const visibilitychangeEvent = hiddenProperty!.replace(/hidden/i, 'visibilitychange');
   const pageshowEvent = 'pageshow';
-  let timer: NodeJS.Timeout;
+  let timer: number;
 
   const handler = () => {
     let width = document.documentElement.clientWidth;
