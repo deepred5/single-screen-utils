@@ -1,0 +1,26 @@
+{
+  "name": "single-screen-utils",
+  "version": "0.0.1",
+  "description": "single screen utils",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "scripts": {
+    "dev": "father dev",
+    "build": "father build",
+    "build:deps": "father prebundle",
+    "prepublishOnly": "father doctor && npm run build"
+  },
+  "keywords": ["single screen", "flexible", "landscape"],
+  "authors": ["deepred5"],
+  "license": "MIT",
+  "files": [
+    "dist",
+    "compiled"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "father": "^4.1.3"
+  }
+}
