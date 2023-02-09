@@ -10,8 +10,14 @@
     "build:deps": "father prebundle",
     "prepublishOnly": "father doctor && npm run build"
   },
-  "keywords": ["single screen", "flexible", "landscape"],
-  "authors": ["deepred5"],
+  "keywords": [
+    "single screen",
+    "flexible",
+    "landscape"
+  ],
+  "authors": [
+    "deepred5"
+  ],
   "license": "MIT",
   "files": [
     "dist",
@@ -22,5 +28,6 @@
   },
   "devDependencies": {
     "father": "^4.1.3"
-  }
+  },
+  "dependencies": {}
 }
