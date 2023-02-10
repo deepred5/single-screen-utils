@@ -1,6 +1,6 @@
 {
   "name": "single-screen-utils",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "single screen utils",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -41,7 +41,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "react": "^18.2.0",
-    "@types/react": "^18.0.27"
+    "@types/react": "^18.0.27",
+    "react": "^18.2.0"
   }
 }
