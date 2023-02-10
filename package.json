@@ -1,6 +1,6 @@
 {
   "name": "single-screen-utils",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "single screen utils",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -13,8 +13,14 @@
   "keywords": [
     "single screen",
     "flexible",
-    "landscape"
+    "landscape",
+    "rem",
+    "dynamic rem"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deepred5/single-screen-utils.git"
+  },
   "authors": [
     "deepred5"
   ],
@@ -23,6 +29,10 @@
     "dist",
     "compiled"
   ],
+  "bugs": {
+    "url": "https://github.com/deepred5/single-screen-utils/issues"
+  },
+  "homepage": "https://github.com/deepred5/single-screen-utils#readme",
   "publishConfig": {
     "access": "public"
   },

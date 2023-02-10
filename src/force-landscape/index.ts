@@ -3,12 +3,12 @@ enum DetectType {
   size, // 根据长宽判断横屏
 }
 interface Props {
-  id: string;
+  id?: string;
   detectType?: DetectType;
   delay?: number;
 };
 
-const defaultProps: Props = {
+const defaultProps: Required<Props> = {
   id: '#app',
   detectType: DetectType.size,
   delay: 800,
@@ -24,13 +24,13 @@ const forceLandscape = (p: Props) => {
         null;
   const visibilitychangeEvent = hiddenProperty!.replace(/hidden/i, 'visibilitychange');
   const pageshowEvent = 'pageshow';
-  let timer: number;
+  let timer: NodeJS.Timeout;
 
   const handler = () => {
     let width = document.documentElement.clientWidth;
     let height = document.documentElement.clientHeight;
     const targetDom = document.querySelector(id) as HTMLElement;
-    if (!targetDom) return;
+    if (!targetDom) return null;
 
     const isLandscape = () => {
       if (detectType === DetectType.size) {

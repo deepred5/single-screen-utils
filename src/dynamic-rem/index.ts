@@ -1,7 +1,7 @@
 enum ModeType {
   portrait,
   landscape,
-}
+};
 interface Props {
   pageWidth?: number;
   pageHeight?: number;
@@ -13,7 +13,7 @@ interface Props {
 const defaultProps: Required<Omit<Props, 'pageAspectRatio'>> = {
   pageWidth: 750,
   pageHeight: 1334,
-  pageFontSize: 32,
+  pageFontSize: 100,
   mode: ModeType.portrait,
 };
 
@@ -40,15 +40,12 @@ const dynamicRem = (p: Props) => {
     let e = 16;
     if (clientWidth > pageWidth) {
       // 认为是ipad/pc
-      // console.log('认为是ipad/pc');
       e = pageFontSize * (clientHeight / pageHeight);
     } else if (aspectRatio > pageAspectRatio) {
       // 宽屏移动端
-      // console.log('宽屏移动端');
       e = pageFontSize * (clientHeight / pageHeight);
     } else {
       // 正常移动端
-      // console.log('正常移动端');
       e = pageFontSize * (clientWidth / pageWidth);
     }
 
