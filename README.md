@@ -29,7 +29,7 @@ const destroy = dynamicRem();
 
 `hooks`方法
 ```jsx
-import { useDynamicRem } from 'single-screen-utils/react';
+import { useDynamicRem } from 'single-screen-utils';
 
 const App = () => {
   useDynamicRem();
@@ -51,7 +51,7 @@ const destroy = forceLandscape();
 
 `hooks`方法
 ```jsx
-import { useForceLandscape } from 'single-screen-utils/react';
+import { useForceLandscape } from 'single-screen-utils';
 
 const App = () => {
   useForceLandscape();

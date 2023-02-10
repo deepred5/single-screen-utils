@@ -1,14 +1,9 @@
 {
   "name": "single-screen-utils",
-  "version": "0.0.8",
+  "version": "1.0.0",
   "description": "single screen utils",
-  "type": "module",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
-  "exports": {
-    ".": "./dist/esm/index.js",
-    "./react": "./dist/esm/react/index.js"
-  },
   "scripts": {
     "dev": "father dev",
     "build": "father build",
