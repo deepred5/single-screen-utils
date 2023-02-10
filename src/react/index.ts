@@ -1,2 +1,2 @@
-export { default as dynamicRem } from './dynamic-rem';
-export { default as forceLandscape } from './force-landscape';
+export { default as UseDynamicRemProps } from './dynamic-rem';
+export { default as useForceLandscape } from './force-landscape';

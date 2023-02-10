@@ -87,9 +87,9 @@ const App = () => {
 
 静态常量:
 
-`dynamicRem.ModeType.portrait` 竖屏模式
+`dynamicRem.ModeType.portrait` (0) 竖屏模式
 
-`dynamicRem.ModeType.landscape` 横屏模式
+`dynamicRem.ModeType.landscape` (1) 横屏模式
 
 ***
 
@@ -113,9 +113,9 @@ const App = () => {
 
 静态常量:
 
-`forceLandscape.DetectType.size` 宽度比高度大，认为是横屏
+`forceLandscape.DetectType.size` (0) 宽度比高度大，认为是横屏
 
-`forceLandscape.DetectType.orientation` 设备方向是90或者-90，认为是横屏
+`forceLandscape.DetectType.orientation` (1) 设备方向是90或者-90，认为是横屏
 
 ## Develop
 

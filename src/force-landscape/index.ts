@@ -1,6 +1,6 @@
 export enum DetectType {
-  orientation, // 根据方向判断横屏
   size, // 根据长宽判断横屏
+  orientation, // 根据方向判断横屏
 }
 export interface LandscapeProps {
   id?: string;
