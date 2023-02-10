@@ -5,7 +5,7 @@ export type UseDynamicRemProps = DynamicRemProps & {
   resetFontSize?: number | string;
 }
 
-const useDynamicRem = (options: UseDynamicRemProps) => {
+const useDynamicRem = (options: UseDynamicRemProps = {}) => {
   useEffect(() => {
     const { resetFontSize, ...props } = options;
     const destroy = dynamicRem(props);

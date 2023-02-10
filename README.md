@@ -19,6 +19,8 @@ yarn add single-screen-utils
 
 ## Quickstart
 
+**dynamicRem**
+
 普通方法
 ```javascript
 import { dynamicRem } from 'single-screen-utils';
@@ -32,6 +34,7 @@ const destroy = dynamicRem();
 import { useDynamicRem } from 'single-screen-utils';
 
 const App = () => {
+  // 自动销毁
   useDynamicRem();
 
   return (
@@ -40,6 +43,8 @@ const App = () => {
 };
 ```
 ***
+
+**forceLandscape**
 
 普通方法
 ```javascript
@@ -54,6 +59,7 @@ const destroy = forceLandscape();
 import { useForceLandscape } from 'single-screen-utils';
 
 const App = () => {
+  // 自动销毁
   useForceLandscape();
 
   return (
@@ -85,11 +91,12 @@ const App = () => {
 | -------- | ------------------------------- |
 | (resetFontSize?: string \| number) => void | 取消rem动态设置，还原默认的字体 |
 
+
 静态常量:
 
-`dynamicRem.ModeType.portrait` (0) 竖屏模式
+`dynamicRem.ModeType.portrait` 竖屏模式 (0) 
 
-`dynamicRem.ModeType.landscape` (1) 横屏模式
+`dynamicRem.ModeType.landscape` 横屏模式 (1) 
 
 ***
 
@@ -111,11 +118,12 @@ const App = () => {
 | -------- | ------------------------------- |
 | () => void | 取消事件监听，不再强制横屏 |
 
+
 静态常量:
 
-`forceLandscape.DetectType.size` (0) 宽度比高度大，认为是横屏
+`forceLandscape.DetectType.size` 宽度比高度大，认为是横屏 (0) 
 
-`forceLandscape.DetectType.orientation` (1) 设备方向是90或者-90，认为是横屏
+`forceLandscape.DetectType.orientation` 设备方向是90或者-90，认为是横屏 (1) 
 
 ## Develop
 
