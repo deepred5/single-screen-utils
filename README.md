@@ -5,7 +5,7 @@
 
 单屏页面布局常用工具方法
 
-`dynamicRem`: 常规`rem`方案，使用屏幕**宽度**进行等比例划分。在单屏页面时，既需要根据屏幕**宽度**也需要根据屏幕**高度**进行`rem`设置
+`dynamicRem`: 单屏页面时，既需要根据屏幕**宽度**也需要根据屏幕**高度**进行`rem`设置 (常规`rem`方案，仅使用屏幕**宽度**进行等比例划分)
 
 `forceLandscape`: 强制元素横屏方案
 
@@ -18,6 +18,8 @@ yarn add single-screen-utils
 ```
 
 ## Quickstart
+
+普通方法
 ```javascript
 import { dynamicRem } from 'single-screen-utils';
 
@@ -25,6 +27,7 @@ import { dynamicRem } from 'single-screen-utils';
 const destroy = dynamicRem();
 ```
 
+`hooks`方法
 ```jsx
 import { useDynamicRem } from 'single-screen-utils/react';
 
@@ -36,7 +39,9 @@ const App = () => {
   )
 };
 ```
+***
 
+普通方法
 ```javascript
 import { forceLandscape } from 'single-screen-utils';
 
@@ -44,6 +49,7 @@ import { forceLandscape } from 'single-screen-utils';
 const destroy = forceLandscape();
 ```
 
+`hooks`方法
 ```jsx
 import { useForceLandscape } from 'single-screen-utils/react';
 
@@ -85,7 +91,7 @@ const App = () => {
 
 `dynamicRem.ModeType.landscape` 横屏模式
 
-<hr >
+***
 
 `forceLandscape`: 强制元素横屏
 
