@@ -1,8 +1,8 @@
-enum ModeType {
+export enum ModeType {
   portrait,
   landscape,
 };
-interface Props {
+export interface DynamicRemProps {
   pageWidth?: number;
   pageHeight?: number;
   pageFontSize?: number;
@@ -10,14 +10,14 @@ interface Props {
   pageAspectRatio?: number;
 }; 
 
-const defaultProps: Required<Omit<Props, 'pageAspectRatio'>> = {
+const defaultProps: Required<Omit<DynamicRemProps, 'pageAspectRatio'>> = {
   pageWidth: 750,
   pageHeight: 1334,
   pageFontSize: 100,
   mode: ModeType.portrait,
 };
 
-const dynamicRem = (p: Props) => {
+const dynamicRem = (p: DynamicRemProps) => {
   const props = Object.assign({}, defaultProps, p);
   const { pageFontSize, pageHeight, pageWidth, mode } = props;
   const pageAspectRatio = props.pageAspectRatio || (pageWidth / pageHeight);
@@ -66,13 +66,13 @@ const dynamicRem = (p: Props) => {
   window.addEventListener('resize', handleResize);
   onResize();
 
-  return (defaultSize: string | number) => {
+  return (resetFontSize?: string | number) => {
     window.removeEventListener('resize', handleResize);
-    if (defaultSize) {
-      if (typeof defaultSize === 'string') {
-        document.documentElement.style.fontSize = defaultSize;
-      } else if (typeof defaultSize === 'number') {
-        document.documentElement.style.fontSize = `${defaultSize}px`;
+    if (resetFontSize) {
+      if (typeof resetFontSize === 'string') {
+        document.documentElement.style.fontSize = resetFontSize;
+      } else if (typeof resetFontSize === 'number') {
+        document.documentElement.style.fontSize = `${resetFontSize}px`;
       }
     }
   };

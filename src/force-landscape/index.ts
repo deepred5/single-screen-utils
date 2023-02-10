@@ -1,20 +1,20 @@
-enum DetectType {
+export enum DetectType {
   orientation, // 根据方向判断横屏
   size, // 根据长宽判断横屏
 }
-interface Props {
+export interface LandscapeProps {
   id?: string;
   detectType?: DetectType;
   delay?: number;
 };
 
-const defaultProps: Required<Props> = {
+const defaultProps: Required<LandscapeProps> = {
   id: '#app',
   detectType: DetectType.size,
   delay: 800,
 }
 
-const forceLandscape = (p: Props) => {
+const forceLandscape = (p: LandscapeProps) => {
   const props = Object.assign({}, defaultProps, p);
   const { id, detectType, delay } = props;
   const orientationchangeEvent = 'onorientationchange' in window ? 'orientationchange' : 'resize';
