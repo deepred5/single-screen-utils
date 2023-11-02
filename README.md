@@ -109,6 +109,7 @@ const App = () => {
 | Id         | 需要强制横屏的元素id                                         | string                                         | \#app           |
 | detectType | 判断是否横屏的依据 <br> DetectType.size 宽度比高度大，认为是横屏 <br> DetectType.orientation 设备方向是90或者-90，认为是横屏 | DetectType.size \| DetectType.orientation | DetectType.size |
 | delay      | 防抖时间(ms)                                                 | number                                         | 800             |
+| onForceResize      | 强制转换元素时的回调方法                                                | function                                         | (isLandscape: boolean) => void            |
 
 返回值:
 
