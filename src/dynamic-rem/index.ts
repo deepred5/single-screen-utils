@@ -36,8 +36,8 @@ const dynamicRem = (p: DynamicRemProps) => {
 
     let aspectRatio = clientWidth / clientHeight;
 
-    // 根元素字体
-    let e = 16;
+    // 根元素字体 (下方三个分支互斥且穷尽,必赋值)
+    let e: number;
     if (clientWidth > pageWidth) {
       // 认为是ipad/pc
       e = pageFontSize * (clientHeight / pageHeight);
