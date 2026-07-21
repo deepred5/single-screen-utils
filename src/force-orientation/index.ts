@@ -23,6 +23,17 @@ const defaultProps: Required<ForceOrientationProps> = {
   onForceResize: () => {},
 };
 
+// 由 handler 写入目标元素的内联样式属性,销毁时按此清理还原。
+const MUTATED_STYLE_PROPS = [
+  'position',
+  'width',
+  'height',
+  'left',
+  'top',
+  'transform',
+  'transformOrigin',
+] as const;
+
 // 强制元素朝向的通用核心逻辑。
 // forceLandscape / forcePortrait 均是它的薄封装,唯一区别是目标朝向 mode。
 const forceOrientation = (mode: OrientationMode, p: ForceOrientationProps = {}) => {
@@ -33,7 +44,8 @@ const forceOrientation = (mode: OrientationMode, p: ForceOrientationProps = {}) 
     'webkitHidden' in document ? 'webkitHidden' :
       'mozHidden' in document ? 'mozHidden' :
         null;
-  const visibilitychangeEvent = hiddenProperty!.replace(/hidden/i, 'visibilitychange');
+  // 老旧浏览器可能没有 Page Visibility API,此时降级为不监听 visibilitychange
+  const visibilitychangeEvent = hiddenProperty ? hiddenProperty.replace(/hidden/i, 'visibilitychange') : null;
   const pageshowEvent = 'pageshow';
   let timer: ReturnType<typeof setTimeout>;
 
@@ -105,15 +117,28 @@ const forceOrientation = (mode: OrientationMode, p: ForceOrientationProps = {}) 
   };
 
   window.addEventListener(orientationchangeEvent, handleResize);
-  window.addEventListener(visibilitychangeEvent, handleVisibilitychange);
+  if (visibilitychangeEvent) {
+    window.addEventListener(visibilitychangeEvent, handleVisibilitychange);
+  }
   window.addEventListener(pageshowEvent, handlePageShow);
 
   handler();
 
   return () => {
     window.removeEventListener(orientationchangeEvent, handleResize);
-    window.removeEventListener(visibilitychangeEvent, handleVisibilitychange);
+    if (visibilitychangeEvent) {
+      window.removeEventListener(visibilitychangeEvent, handleVisibilitychange);
+    }
     window.removeEventListener(pageshowEvent, handlePageShow);
+    // 清掉可能挂起的防抖回调,避免销毁后又把样式写回去
+    clearTimeout(timer);
+    // 还原被强制朝向时写入的内联样式
+    const targetDom = document.querySelector(id) as HTMLElement | null;
+    if (targetDom) {
+      MUTATED_STYLE_PROPS.forEach((prop) => {
+        targetDom.style[prop] = '';
+      });
+    }
   };
 };
 
