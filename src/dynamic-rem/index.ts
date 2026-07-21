@@ -68,16 +68,14 @@ const dynamicRem = (p: DynamicRemProps = {}): DynamicRemHandle => {
 
     let aspectRatio = clientWidth / clientHeight;
 
-    // 根元素字体 (下方三个分支互斥且穷尽,必赋值)
+    // 根元素字体: fontSize = pageFontSize × min(宽度比, 高度比) —— contain 缩放,
+    // 保证设计稿内容双向都能装进视口。aspectRatio > pageAspectRatio 等价于高度比更小。
     let e: number;
-    if (clientWidth > pageWidth) {
-      // 认为是ipad/pc
-      e = pageFontSize * (clientHeight / pageHeight);
-    } else if (aspectRatio > pageAspectRatio) {
-      // 宽屏移动端
+    if (aspectRatio > pageAspectRatio) {
+      // 视口比设计稿更宽(含 ipad/pc 宽屏) → 高度是瓶颈
       e = pageFontSize * (clientHeight / pageHeight);
     } else {
-      // 正常移动端
+      // 视口比设计稿更瘦高或等比 → 宽度是瓶颈
       e = pageFontSize * (clientWidth / pageWidth);
     }
 

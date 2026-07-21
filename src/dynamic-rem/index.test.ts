@@ -42,11 +42,19 @@ describe('dynamicRem', () => {
     destroy();
   });
 
-  it('宽度超过设计稿(pc/ipad)按高度比例设置根字体', () => {
-    setViewport(1000, 1300);
+  it('宽度超过设计稿但宽高比仍偏宽(pc/ipad)按高度比例设置根字体', () => {
+    setViewport(1000, 1300); // aspectRatio 0.77 > 0.56 → 高度是瓶颈
     const destroy = dynamicRem({ pageWidth: 750, pageHeight: 1334, pageFontSize: 100 });
     // 100 * (1300 / 1334) = 97.451
     expect(document.documentElement.style.fontSize).toBe('97.451px');
+    destroy();
+  });
+
+  it('宽度超过设计稿但视口更瘦高时按宽度比例设置根字体(回归: 旧实现横向溢出)', () => {
+    setViewport(800, 1600); // clientWidth 800 > 750,但 aspectRatio 0.5 < 0.56 → 宽度是瓶颈
+    const destroy = dynamicRem({ pageWidth: 750, pageHeight: 1334, pageFontSize: 100 });
+    // min(800/750, 1600/1334) = 800/750 → 100 * (800 / 750) = 106.667 (旧实现错误地给出 119.94,内容溢出)
+    expect(document.documentElement.style.fontSize).toBe('106.667px');
     destroy();
   });
 
