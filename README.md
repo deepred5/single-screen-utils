@@ -139,6 +139,12 @@ handle('16px');
 
 `useDynamicRem` 的返回值为 `{ pause, resume }`，语义与上述一致（组件卸载后调用为空操作）。
 
+**hooks 使用注意**（对 `useDynamicRem` / `useForceLandscape` / `useForcePortrait` 均适用）:
+
+- options 仅在**首次渲染**时生效，后续变化不会重新初始化；如需变更配置，请卸载后重新挂载组件。
+- `dynamicRem` 操作全局根字体（`html` 的 font-size），同一时刻页面内只应存在**一个**实例（hook 或普通方法皆计入），多实例同时运行会互相覆盖。
+- hooks 内部使用 `useLayoutEffect`（SSR 环境自动退回 `useEffect`），在浏览器绘制前完成字体设置，避免首帧闪跳。
+
 
 静态常量:
 
