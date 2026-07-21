@@ -9,6 +9,8 @@
 
 `forceLandscape`: 强制元素横屏方案
 
+`forcePortrait`: 强制元素竖屏方案
+
 ## Install
 
 ```bash
@@ -61,6 +63,31 @@ import { useForceLandscape } from 'single-screen-utils';
 const App = () => {
   // 自动销毁
   useForceLandscape();
+
+  return (
+    <div id="app">App</div>
+  )
+};
+```
+***
+
+**forcePortrait**
+
+普通方法
+```javascript
+import { forcePortrait } from 'single-screen-utils';
+
+// 返回一个销毁函数
+const destroy = forcePortrait();
+```
+
+`hooks`方法
+```jsx
+import { useForcePortrait } from 'single-screen-utils';
+
+const App = () => {
+  // 自动销毁
+  useForcePortrait();
 
   return (
     <div id="app">App</div>
@@ -125,6 +152,34 @@ const App = () => {
 `forceLandscape.DetectType.size` 宽度比高度大，认为是横屏 (0) 
 
 `forceLandscape.DetectType.orientation` 设备方向是90或者-90，认为是横屏 (1) 
+
+***
+
+`forcePortrait`: 强制元素竖屏。参数、返回值、静态常量与 `forceLandscape` 完全一致，仅旋转方向相反（设备处于横屏时旋转，处于竖屏时直接铺满）。
+
+参数:
+
+| 属性       | 说明                                                         | 类型                                           | 默认值          |
+| ---------- | ------------------------------------------------------------ | ---------------------------------------------- | --------------- |
+| Id         | 需要强制竖屏的元素id                                         | string                                         | \#app           |
+| detectType | 判断是否横屏的依据 <br> DetectType.size 宽度比高度大，认为是横屏 <br> DetectType.orientation 设备方向是90或者-90，认为是横屏 | DetectType.size \| DetectType.orientation | DetectType.size |
+| delay      | 防抖时间(ms)                                                 | number                                         | 800             |
+| onForceResize      | 强制转换元素时的回调方法，参数为设备是否已处于目标（竖屏）朝向 | function                                         | (isPortrait: boolean) => void            |
+
+返回值:
+
+返回一个函数，调用此函数取消事件监听
+
+| 类型 | 说明                            |
+| -------- | ------------------------------- |
+| () => void | 取消事件监听，不再强制竖屏 |
+
+
+静态常量:
+
+`forcePortrait.DetectType.size` 宽度比高度大，认为是横屏 (0) 
+
+`forcePortrait.DetectType.orientation` 设备方向是90或者-90，认为是横屏 (1) 
 
 ## Develop
 
