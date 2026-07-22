@@ -46,10 +46,10 @@ describe('forceLandscape / forcePortrait', () => {
   });
 
   describe('forcePortrait', () => {
-    it('横屏设备下旋转 90 度铺满', () => {
+    it('横屏设备下旋转 -90 度铺满', () => {
       setViewport(812, 375);
       const destroy = forcePortrait();
-      expect(app.style.transform).toBe('rotate(90deg)');
+      expect(app.style.transform).toBe('rotate(-90deg)');
       expect(app.style.width).toBe('375px'); // = height
       expect(app.style.height).toBe('812px'); // = width
       expect(app.style.left).toBe('218.5px'); // 0 - (375-812)/2
@@ -69,6 +69,56 @@ describe('forceLandscape / forcePortrait', () => {
     it('带 DetectType 静态常量', () => {
       expect(forcePortrait.DetectType.size).toBe(0);
       expect(forcePortrait.DetectType.orientation).toBe(1);
+    });
+  });
+
+  describe('angle 自动选择与手动覆盖', () => {
+    function setScreenAngle(angle: number | null) {
+      Object.defineProperty(window.screen, 'orientation', {
+        value: angle === null ? undefined : { angle },
+        configurable: true,
+      });
+    }
+
+    it('forcePortrait: 设备逆时针转成横屏(angle=90)时旋转 -90 度', () => {
+      setViewport(812, 375);
+      setScreenAngle(90);
+      const destroy = forcePortrait();
+      expect(app.style.transform).toBe('rotate(-90deg)');
+      destroy();
+    });
+
+    it('forcePortrait: 设备顺时针转成横屏(angle=270)时旋转 90 度', () => {
+      setViewport(812, 375);
+      setScreenAngle(270);
+      const destroy = forcePortrait();
+      expect(app.style.transform).toBe('rotate(90deg)');
+      destroy();
+    });
+
+    it('forceLandscape: 设备正持竖屏(angle=0)时旋转 90 度', () => {
+      setViewport(375, 812);
+      setScreenAngle(0);
+      const destroy = forceLandscape();
+      expect(app.style.transform).toBe('rotate(90deg)');
+      destroy();
+    });
+
+    it('朝向信息与尺寸判断矛盾时退回默认角度', () => {
+      // 桌面浏览器窗口拉成横向:尺寸判断为横屏,但屏幕本身没转(angle=0)
+      setViewport(812, 375);
+      setScreenAngle(0);
+      const destroy = forcePortrait();
+      expect(app.style.transform).toBe('rotate(-90deg)');
+      destroy();
+    });
+
+    it('手动指定 angle 优先于自动判断', () => {
+      setViewport(812, 375);
+      setScreenAngle(90); // 自动会选 -90
+      const destroy = forcePortrait({ angle: 90 });
+      expect(app.style.transform).toBe('rotate(90deg)');
+      destroy();
     });
   });
 
