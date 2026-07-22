@@ -136,6 +136,7 @@ const App = () => {
 | Id         | 需要强制横屏的元素id                                         | string                                         | \#app           |
 | detectType | 判断是否横屏的依据 <br> DetectType.size 宽度比高度大，认为是横屏 <br> DetectType.orientation 设备方向是90或者-90，认为是横屏 | DetectType.size \| DetectType.orientation | DetectType.size |
 | delay      | 防抖时间(ms)                                                 | number                                         | 800             |
+| angle      | 旋转角度覆盖。不传则根据设备物理朝向（screen.orientation / window.orientation）自动选择正确的旋转方向，读取不到朝向时横屏默认 90、竖屏默认 -90 | 90 \| -90                                      | 自动            |
 | onForceResize      | 强制转换元素时的回调方法                                                | function                                         | (isLandscape: boolean) => void            |
 
 返回值:
@@ -164,6 +165,7 @@ const App = () => {
 | Id         | 需要强制竖屏的元素id                                         | string                                         | \#app           |
 | detectType | 判断是否横屏的依据 <br> DetectType.size 宽度比高度大，认为是横屏 <br> DetectType.orientation 设备方向是90或者-90，认为是横屏 | DetectType.size \| DetectType.orientation | DetectType.size |
 | delay      | 防抖时间(ms)                                                 | number                                         | 800             |
+| angle      | 旋转角度覆盖。不传则根据设备物理朝向（screen.orientation / window.orientation）自动选择正确的旋转方向，读取不到朝向时横屏默认 90、竖屏默认 -90 | 90 \| -90                                      | 自动            |
 | onForceResize      | 强制转换元素时的回调方法，参数为设备是否已处于目标（竖屏）朝向 | function                                         | (isPortrait: boolean) => void            |
 
 返回值:
