@@ -35,7 +35,8 @@
   },
   "homepage": "https://github.com/deepred5/single-screen-utils#readme",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
     "father": "^4.1.3",
