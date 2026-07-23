@@ -1,6 +1,6 @@
 {
   "name": "single-screen-utils",
-  "version": "1.1.0-beta.3",
+  "version": "1.1.0",
   "description": "single screen utils",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -35,7 +35,8 @@
   },
   "homepage": "https://github.com/deepred5/single-screen-utils#readme",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
     "father": "^4.1.3",
