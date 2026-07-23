@@ -108,6 +108,7 @@ const App = () => {
 | pageFontSize    | 页面html元素的字体 (px) | number                                  | 100                    |
 | pageAspectRatio | 页面宽高比              | number                                  | pageWidth / pageHeight             |
 | mode            | 横屏模式/竖屏模式       | ModeType.portrait \| ModeType.landscape | ModeType.portrait 竖屏 |
+| pauseOnInputFocus | 输入框聚焦时自动暂停(冻结字体)，失焦后自动恢复。用于避免软键盘弹起改变视口高度导致字体跳动 | boolean | false |
 
 
 返回值:
@@ -117,6 +118,32 @@ const App = () => {
 | 类型 | 说明                            |
 | -------- | ------------------------------- |
 | (resetFontSize?: string \| number) => void | 取消rem动态设置，还原默认的字体 |
+
+返回的函数上还挂载了两个方法:
+
+| 方法 | 说明 |
+| -------- | ------------------------------- |
+| pause() | 暂停响应 resize，字体冻结在当前值 |
+| resume() | 恢复响应 resize，并立即重算一次 |
+
+```javascript
+const handle = dynamicRem();
+
+// 打开含输入框的弹窗前冻结，关闭后恢复 (也可直接用 pauseOnInputFocus 自动处理)
+handle.pause();
+handle.resume();
+
+// 兼容原有用法：调用销毁并还原字体
+handle('16px');
+```
+
+`useDynamicRem` 的返回值为 `{ pause, resume }`，语义与上述一致（组件卸载后调用为空操作）。
+
+**hooks 使用注意**（对 `useDynamicRem` / `useForceLandscape` / `useForcePortrait` 均适用）:
+
+- options 仅在**首次渲染**时生效，后续变化不会重新初始化；如需变更配置，请卸载后重新挂载组件。
+- `dynamicRem` 操作全局根字体（`html` 的 font-size），同一时刻页面内只应存在**一个**实例（hook 或普通方法皆计入），多实例同时运行会互相覆盖。
+- hooks 内部使用 `useLayoutEffect`（SSR 环境自动退回 `useEffect`），在浏览器绘制前完成字体设置，避免首帧闪跳。
 
 
 静态常量:
