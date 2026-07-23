@@ -1,6 +1,6 @@
 {
   "name": "single-screen-utils",
-  "version": "1.1.0-beta.2",
+  "version": "1.1.0",
   "description": "single screen utils",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
