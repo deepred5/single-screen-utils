@@ -45,13 +45,14 @@ const dynamicRem = (p: DynamicRemProps = {}): DynamicRemHandle => {
   const props = Object.assign({}, defaultProps, p);
   const { pageFontSize, pageHeight, pageWidth, mode, pauseOnInputFocus } = props;
   const pageAspectRatio = props.pageAspectRatio || (pageWidth / pageHeight);
-  const userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent;
-  const chromeVersion = /chrome\/(\d+)/i.exec(userAgent);
-  // Chromium 79 起，文字缩放不再用于 em/rem 布局长度，不能再根据计算字号反向补偿。
+
+  // Chrome 79 起,文字缩放不再影响 em/rem 布局长度,不能用计算字号反向补偿。
   // https://issues.chromium.org/issues/40337446
-  const shouldCompensateFontSize = !(
-    /android/i.test(userAgent) && chromeVersion && Number(chromeVersion[1]) >= 79
-  );
+  // 仅跳过已确认的 Android Chrome/WebView 分支,其他环境保持既有行为。
+  // 在实例初始化时读取 UA,避免模块导入依赖浏览器环境。
+  const ua = window.navigator.userAgent;
+  const chromeVersion = /chrome\/(\d+)/i.exec(ua);
+  const skipFontCompensation = /android/i.test(ua) && !!chromeVersion && Number(chromeVersion[1]) >= 79;
 
   // 手动暂停(pause/resume)与焦点暂停(pauseOnInputFocus)相互独立,
   // 任一生效即不响应 resize;各自解除时若整体已不再暂停,立即重算一次。
@@ -65,6 +66,7 @@ const dynamicRem = (p: DynamicRemProps = {}): DynamicRemHandle => {
 
     let clientWidth = document.documentElement.clientWidth;
     let clientHeight = document.documentElement.clientHeight;
+    if (clientWidth <= 0 || clientHeight <= 0) return;
 
     // 该页面需要强制横屏
     if (mode === ModeType.landscape) {
@@ -89,12 +91,12 @@ const dynamicRem = (p: DynamicRemProps = {}): DynamicRemHandle => {
     e = parseFloat(e.toFixed(3));
 
     document.documentElement.style.fontSize = `${e}px`;
-    if (shouldCompensateFontSize) {
-      let realitySize = parseFloat(window.getComputedStyle(document.documentElement).fontSize);
-      if (e !== realitySize) {
-        e = e * e / realitySize;
-        document.documentElement.style.fontSize = `${e}px`;
-      }
+    if (skipFontCompensation) return;
+
+    const realitySize = parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+    if (Number.isFinite(realitySize) && realitySize > 0 && e !== realitySize) {
+      e = e * e / realitySize;
+      document.documentElement.style.fontSize = `${e}px`;
     }
   }
 

@@ -99,11 +99,6 @@ const App = () => {
 
 `dynamicRem`: 根据页面宽高比动态设置html的rem大小
 
-Android 且 UA 中 Chrome 主版本 ≥79 时，根字号只按视口比例设置，不再根据
-`getComputedStyle().fontSize` 反向补偿，避免 WebView 的系统文字缩放使 rem 布局整体放大或缩小。
-旧版 Android、无法识别 Chrome 版本的环境以及非 Android 环境保留原补偿行为；
-`useDynamicRem` 同样生效，现有参数及暂停/恢复接口不变。
-
 参数:
 
 | 属性            | 说明                    | 类型                                    | 默认值                 |

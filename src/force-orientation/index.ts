@@ -53,7 +53,10 @@ const MUTATED_STYLE_PROPS = [
 const forceOrientation = (mode: OrientationMode, p: ForceOrientationProps = {}) => {
   const props = Object.assign({}, defaultProps, p);
   const { id, detectType, delay, angle, onForceResize } = props;
-  const orientationchangeEvent = 'onorientationchange' in window ? 'orientationchange' : 'resize';
+  // WebView 可仅改变可用尺寸而不改变方向,因此始终监听 resize。
+  // 两个事件共用同一防抖回调,避免一次旋转重复同步。
+  const resizeEvents = ['resize'];
+  if ('onorientationchange' in window) resizeEvents.push('orientationchange');
   const hiddenProperty = 'hidden' in document ? 'hidden' :
     'webkitHidden' in document ? 'webkitHidden' :
       'mozHidden' in document ? 'mozHidden' :
@@ -145,7 +148,7 @@ const forceOrientation = (mode: OrientationMode, p: ForceOrientationProps = {}) 
     }
   };
 
-  window.addEventListener(orientationchangeEvent, handleResize);
+  resizeEvents.forEach((event) => window.addEventListener(event, handleResize));
   if (visibilitychangeEvent) {
     window.addEventListener(visibilitychangeEvent, handleVisibilitychange);
   }
@@ -154,7 +157,7 @@ const forceOrientation = (mode: OrientationMode, p: ForceOrientationProps = {}) 
   handler();
 
   return () => {
-    window.removeEventListener(orientationchangeEvent, handleResize);
+    resizeEvents.forEach((event) => window.removeEventListener(event, handleResize));
     if (visibilitychangeEvent) {
       window.removeEventListener(visibilitychangeEvent, handleVisibilitychange);
     }
