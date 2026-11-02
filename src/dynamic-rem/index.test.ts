@@ -90,6 +90,75 @@ describe('dynamicRem', () => {
     expect(dynamicRem.ModeType.landscape).toBe(1);
   });
 
+  describe('Android 字体缩放补偿', () => {
+    const androidUA = (version: string) =>
+      `Mozilla/5.0 (Linux; Android 16; Pixel; wv) AppleWebKit/537.36 Chrome/${version} Mobile Safari/537.36`;
+    const landscapeOptions = {
+      pageWidth: 1730,
+      pageHeight: 969,
+      pageFontSize: 32,
+      mode: dynamicRem.ModeType.landscape,
+    };
+    const handles: ReturnType<typeof dynamicRem>[] = [];
+    const createRem = (options: Parameters<typeof dynamicRem>[0]) => {
+      const handle = dynamicRem(options);
+      handles.push(handle);
+      return handle;
+    };
+    afterEach(() => {
+      handles.splice(0).forEach((handle) => handle());
+    });
+    const mockFontScale = (scale: number) => {
+      vi.mocked(window.getComputedStyle).mockImplementation(
+        (el: Element) => ({ fontSize: `${parseFloat((el as HTMLElement).style.fontSize) * scale}px` }) as CSSStyleDeclaration,
+      );
+    };
+
+    it.each<[string, number]>([
+      ['79.0.3945.0', 0.9],
+      ['155.0.8059.46', 0.9],
+      ['155.0.8059.46', 1.45],
+    ])('Android Chrome %s 在文字缩放 %s 时保持视口计算的 rem', (version, scale) => {
+      vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(androidUA(version));
+      mockFontScale(scale);
+      setViewport(711, 320);
+      createRem(landscapeOptions);
+      // WebView 的计算字号受文字缩放影响，但 rem 布局应保持 32 * 320 / 969。
+      expect(document.documentElement.style.fontSize).toBe('10.568px');
+    });
+
+    it.each([
+      androidUA('78.0.3904.0'),
+      'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 Version/4.0 Mobile Safari/537.36',
+      'Mozilla/5.0 (Linux; Android 16) Chrome/not-a-version Mobile Safari/537.36',
+      'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/155.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile Safari/604.1',
+    ])('旧版、未知版本和非 Android 环境保留原补偿：%s', (ua) => {
+      vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(ua);
+      mockFontScale(1.25);
+      setViewport(375, 812);
+      createRem({ pageWidth: 750, pageHeight: 1334, pageFontSize: 100 });
+      expect(document.documentElement.style.fontSize).toBe('40px');
+    });
+
+    it('现代 Android 在暂停后恢复和 resize 时仍跳过补偿', () => {
+      vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(androidUA('155.0.8059.46'));
+      mockFontScale(0.9);
+      setViewport(711, 320);
+      const handle = createRem(landscapeOptions);
+      handle.pause();
+      setViewport(711, 300);
+      window.dispatchEvent(new Event('resize'));
+      expect(document.documentElement.style.fontSize).toBe('10.568px');
+      mockFontScale(1.45);
+      handle.resume();
+      expect(document.documentElement.style.fontSize).toBe('9.907px');
+      setViewport(711, 320);
+      window.dispatchEvent(new Event('resize'));
+      expect(document.documentElement.style.fontSize).toBe('10.568px');
+    });
+  });
+
   describe('pause / resume', () => {
     it('pause 后 resize 不再重算,resume 后立即重算', () => {
       setViewport(375, 812);

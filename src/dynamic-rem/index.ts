@@ -45,6 +45,13 @@ const dynamicRem = (p: DynamicRemProps = {}): DynamicRemHandle => {
   const props = Object.assign({}, defaultProps, p);
   const { pageFontSize, pageHeight, pageWidth, mode, pauseOnInputFocus } = props;
   const pageAspectRatio = props.pageAspectRatio || (pageWidth / pageHeight);
+  const userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent;
+  const chromeVersion = /chrome\/(\d+)/i.exec(userAgent);
+  // Chromium 79 起，文字缩放不再用于 em/rem 布局长度，不能再根据计算字号反向补偿。
+  // https://issues.chromium.org/issues/40337446
+  const shouldCompensateFontSize = !(
+    /android/i.test(userAgent) && chromeVersion && Number(chromeVersion[1]) >= 79
+  );
 
   // 手动暂停(pause/resume)与焦点暂停(pauseOnInputFocus)相互独立,
   // 任一生效即不响应 resize;各自解除时若整体已不再暂停,立即重算一次。
@@ -82,10 +89,12 @@ const dynamicRem = (p: DynamicRemProps = {}): DynamicRemHandle => {
     e = parseFloat(e.toFixed(3));
 
     document.documentElement.style.fontSize = `${e}px`;
-    let realitySize = parseFloat(window.getComputedStyle(document.documentElement).fontSize);
-    if (e !== realitySize) {
-      e = e * e / realitySize;
-      document.documentElement.style.fontSize = `${e}px`;
+    if (shouldCompensateFontSize) {
+      let realitySize = parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+      if (e !== realitySize) {
+        e = e * e / realitySize;
+        document.documentElement.style.fontSize = `${e}px`;
+      }
     }
   }
 
