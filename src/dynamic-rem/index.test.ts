@@ -1,9 +1,22 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 import dynamicRem from './index';
 
 function setViewport(width: number, height: number) {
   Object.defineProperty(document.documentElement, 'clientWidth', { value: width, configurable: true });
   Object.defineProperty(document.documentElement, 'clientHeight', { value: height, configurable: true });
+}
+
+const androidChrome = (version: number) =>
+  `Mozilla/5.0 (Linux; Android 10; Pixel 3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${version}.0.0.0 Mobile Safari/537.36`;
+
+function setUserAgent(ua: string) {
+  vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue(ua);
+}
+
+function mockTextScale(scale: number) {
+  vi.mocked(window.getComputedStyle).mockImplementation(
+    (el: Element) => ({ fontSize: `${parseFloat((el as HTMLElement).style.fontSize) * scale}px` }) as CSSStyleDeclaration,
+  );
 }
 
 describe('dynamicRem', () => {
@@ -17,6 +30,112 @@ describe('dynamicRem', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
+    document.body.innerHTML = '';
+  });
+
+  describe('文字缩放补偿', () => {
+    it.each([
+      ['Android Chrome 78', androidChrome(78), false],
+      ['Android Chrome 79', androidChrome(79), true],
+      ['现代 Android Chrome', androidChrome(130), true],
+      ['Android WebView', 'Mozilla/5.0 (Linux; Android 13; Pixel 7 Build/TQ3A; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.0.0 Mobile Safari/537.36', true],
+      ['桌面 Chrome', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36', false],
+      ['iOS Chrome', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 CriOS/130.0.0.0 Mobile/15E148 Safari/604.1', false],
+      ['未知 Android 内核', 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Mobile Safari/537.36', false],
+      ['未知 UA', '', false],
+    ])('%s 在文字放大时使用对应补偿策略', (_name, ua, skipCompensation) => {
+      setUserAgent(ua);
+      setViewport(750, 1334);
+      mockTextScale(1.2);
+      const handle = dynamicRem();
+      onTestFinished(() => handle());
+
+      expect(parseFloat(document.documentElement.style.fontSize)).toBeCloseTo(skipCompensation ? 100 : 100 / 1.2, 6);
+      if (skipCompensation) {
+        expect(window.getComputedStyle).not.toHaveBeenCalled();
+      }
+    });
+
+    it.each(['0px', '-20px', 'NaN', 'Infinity', ''])('旧补偿分支忽略异常计算字号 %s', (fontSize) => {
+      setUserAgent(androidChrome(78));
+      setViewport(750, 1334);
+      vi.mocked(window.getComputedStyle).mockReturnValue({ fontSize } as CSSStyleDeclaration);
+      const handle = dynamicRem();
+      onTestFinished(() => handle());
+
+      expect(document.documentElement.style.fontSize).toBe('100px');
+    });
+
+    it('现代 Android 横屏 resize、暂停恢复及销毁均保持未补偿字号', () => {
+      setUserAgent(androidChrome(130));
+      mockTextScale(1.2);
+      setViewport(375, 750);
+      const handle = dynamicRem({ pageWidth: 750, pageHeight: 375, mode: dynamicRem.ModeType.landscape });
+      onTestFinished(() => handle());
+      expect(document.documentElement.style.fontSize).toBe('100px');
+
+      setViewport(300, 600);
+      window.dispatchEvent(new Event('resize'));
+      expect(document.documentElement.style.fontSize).toBe('80px');
+
+      handle.pause();
+      setViewport(225, 450);
+      window.dispatchEvent(new Event('resize'));
+      expect(document.documentElement.style.fontSize).toBe('80px');
+      handle.resume();
+      expect(document.documentElement.style.fontSize).toBe('60px');
+
+      handle(); // 不传字号时销毁保留当前行内值
+      setViewport(375, 750);
+      window.dispatchEvent(new Event('resize'));
+      expect(document.documentElement.style.fontSize).toBe('60px');
+      handle('16px');
+      expect(document.documentElement.style.fontSize).toBe('16px');
+      expect(window.getComputedStyle).not.toHaveBeenCalled();
+    });
+
+    it('现代 Android 输入框聚焦冻结,失焦后仍按目标字号恢复', () => {
+      vi.useFakeTimers();
+      setUserAgent(androidChrome(130));
+      mockTextScale(1.2);
+      setViewport(750, 1334);
+      document.body.innerHTML = '<input />';
+      const input = document.querySelector('input')!;
+      const handle = dynamicRem({ pauseOnInputFocus: true });
+      onTestFinished(() => handle());
+
+      input.focus();
+      setViewport(750, 667);
+      window.dispatchEvent(new Event('resize'));
+      expect(document.documentElement.style.fontSize).toBe('100px');
+      input.blur();
+      vi.runAllTimers();
+      expect(document.documentElement.style.fontSize).toBe('50px');
+
+      input.focus();
+      input.blur();
+      handle('16px'); // 销毁时取消尚未执行的失焦恢复
+      vi.runAllTimers();
+      window.dispatchEvent(new Event('resize'));
+      expect(document.documentElement.style.fontSize).toBe('16px');
+    });
+  });
+
+  it.each([[0, 1334], [750, 0], [0, 0]])('视口 %s × %s 时保留字号,尺寸恢复后继续计算', (width, height) => {
+    setViewport(width, height);
+    document.documentElement.style.fontSize = '16px';
+    const handle = dynamicRem();
+    onTestFinished(() => handle());
+    expect(document.documentElement.style.fontSize).toBe('16px');
+    expect(window.getComputedStyle).not.toHaveBeenCalled();
+
+    setViewport(750, 1334);
+    window.dispatchEvent(new Event('resize'));
+    expect(document.documentElement.style.fontSize).toBe('100px');
+    setViewport(width, height);
+    window.dispatchEvent(new Event('resize'));
+    expect(document.documentElement.style.fontSize).toBe('100px');
   });
 
   it('返回一个销毁函数', () => {
